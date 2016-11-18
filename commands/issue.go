@@ -17,9 +17,9 @@ var (
 	cmdIssue = &Command{
 		Run: listIssues,
 		Usage: `
-issue [-a <ASSIGNEE>] [-c <CREATOR>] [-@ <USER>] [-s <STATE>] [-f <FORMAT>] [-M <MILESTONE>] [-l <LABELS>] [-d <DATE>] [-o <SORT_KEY> [-^]] [-L <LIMIT>]
-issue create [-oc] [-m <MESSAGE>|-F <FILE>] [-a <USERS>] [-M <MILESTONE>] [-l <LABELS>]
-issue labels [--color]
+issue [-a <ASSIGNEE>] [-c <CREATOR>] [-@ <USER>] [-s <STATE>] [-f <FORMAT>] [-M <MILESTONE>] [-l <LABELS>] [-d <DATE>] [-o <SORT_KEY> [-^]] [-L <LIMIT>] [-r <REMOTE>]
+issue create [-oc] [-m <MESSAGE>|-F <FILE>] [-a <USERS>] [-M <MILESTONE>] [-l <LABELS>] [-r <REMOTE>]
+issue labels [--color] [-r <REMOTE>]
 `,
 		Long: `Manage GitHub issues for the current project.
 
@@ -143,20 +143,23 @@ With no arguments, show a list of open issues.
 
 	--color
 		Enable colored output for labels list.
+
+	-r --remote
+		Specify the remote where the issue should be created.
 `,
 	}
 
 	cmdCreateIssue = &Command{
 		Key:   "create",
 		Run:   createIssue,
-		Usage: "issue create [-o] [-m <MESSAGE>|-F <FILE>] [-a <USERS>] [-M <MILESTONE>] [-l <LABELS>]",
+		Usage: "issue create [-o] [-m <MESSAGE>|-F <FILE>] [-a <USERS>] [-M <MILESTONE>] [-l <LABELS>] [-r <REMOTE>]",
 		Long:  "Open an issue in the current project.",
 	}
 
 	cmdLabel = &Command{
 		Key:   "labels",
 		Run:   listLabels,
-		Usage: "issue labels [--color]",
+		Usage: "issue labels [--color] [-r <REMOTE>]",
 		Long:  "List the labels available in this repository.",
 	}
 
@@ -170,12 +173,13 @@ With no arguments, show a list of open issues.
 	flagIssueLabelsFilter,
 	flagIssueSince,
 	flagIssueSort,
+	flagIssueRemote,
 	flagIssueFile string
 
 	flagIssueEdit,
 	flagIssueCopy,
 	flagIssueBrowse,
-	flagIssueSortAscending bool
+	flagIssueSortAscending,
 	flagIssueIncludePulls bool
 
 	flagIssueMilestone uint64
@@ -186,6 +190,8 @@ With no arguments, show a list of open issues.
 	flagIssueLimit int
 
 	flagLabelsColorize bool
+
+	flagLabelsRemote string
 )
 
 func init() {
@@ -197,6 +203,7 @@ func init() {
 	cmdCreateIssue.Flag.BoolVarP(&flagIssueBrowse, "browse", "o", false, "BROWSE")
 	cmdCreateIssue.Flag.BoolVarP(&flagIssueCopy, "copy", "c", false, "COPY")
 	cmdCreateIssue.Flag.BoolVarP(&flagIssueEdit, "edit", "e", false, "EDIT")
+	cmdCreateIssue.Flag.StringVarP(&flagIssueRemote, "remote", "r", "", "REMOTE")
 
 	cmdIssue.Flag.StringVarP(&flagIssueAssignee, "assignee", "a", "", "ASSIGNEE")
 	cmdIssue.Flag.StringVarP(&flagIssueState, "state", "s", "", "STATE")
@@ -210,8 +217,8 @@ func init() {
 	cmdIssue.Flag.BoolVarP(&flagIssueSortAscending, "sort-ascending", "^", false, "SORT_KEY")
 	cmdIssue.Flag.BoolVarP(&flagIssueIncludePulls, "include-pulls", "", false, "INCLUDE_PULLS")
 	cmdIssue.Flag.IntVarP(&flagIssueLimit, "limit", "L", -1, "LIMIT")
-
 	cmdLabel.Flag.BoolVarP(&flagLabelsColorize, "color", "", false, "COLORIZE")
+	cmdLabel.Flag.StringVarP(&flagIssueRemote, "remote", "r", "", "REMOTE")
 
 	cmdIssue.Use(cmdCreateIssue)
 	cmdIssue.Use(cmdLabel)
@@ -222,7 +229,13 @@ func listIssues(cmd *Command, args *Args) {
 	localRepo, err := github.LocalRepo()
 	utils.Check(err)
 
-	project, err := localRepo.MainProject()
+	// If the user specifies a remote, load that project
+	var project *github.Project
+	if flagIssueRemote != "" {
+		project, err = localRepo.RemoteProject(flagIssueRemote)
+	} else { // Otherwise, load the default
+		project, err = localRepo.MainProject()
+	}
 	utils.Check(err)
 
 	gh := github.NewClient(project.Host)
@@ -373,7 +386,13 @@ func createIssue(cmd *Command, args *Args) {
 	localRepo, err := github.LocalRepo()
 	utils.Check(err)
 
-	project, err := localRepo.MainProject()
+	// If the user specifies a remote, load that project
+	var project *github.Project
+	if flagIssueRemote != "" {
+		project, err = localRepo.RemoteProject(flagIssueRemote)
+	} else { // Otherwise, load the default
+		project, err = localRepo.MainProject()
+	}
 	utils.Check(err)
 
 	gh := github.NewClient(project.Host)
