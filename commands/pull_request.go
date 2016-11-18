@@ -17,7 +17,7 @@ import (
 var cmdPullRequest = &Command{
 	Run: pullRequest,
 	Usage: `
-pull-request [-focp] [-b <BASE>] [-h <HEAD>] [-r <REVIEWERS> ] [-a <ASSIGNEES>] [-M <MILESTONE>] [-l <LABELS>]
+pull-request [-focp] [-b <BASE>] [-h <HEAD>] [-r <REVIEWERS> ] [-a <ASSIGNEES>] [-M <MILESTONE>] [-l <LABELS>] [-t <REMOTE>]
 pull-request -m <MESSAGE>
 pull-request -F <FILE> [--edit]
 pull-request -i <ISSUE>
@@ -69,6 +69,9 @@ pull-request -i <ISSUE>
 	-l, --labels <LABELS>
 		Add a comma-separated list of labels to this pull request.
 
+	-t, --remote <REMOTE>
+		Specify the remote project where the pull request should be opened
+
 ## Configuration:
 
 	HUB_RETRY_TIMEOUT=<SECONDS>
@@ -85,7 +88,8 @@ var (
 	flagPullRequestHead,
 	flagPullRequestIssue,
 	flagPullRequestMessage,
-	flagPullRequestFile string
+	flagPullRequestFile,
+	flagPullRequestRemote string
 
 	flagPullRequestBrowse,
 	flagPullRequestCopy,
@@ -115,6 +119,7 @@ func init() {
 	cmdPullRequest.Flag.VarP(&flagPullRequestReviewers, "reviewer", "r", "USERS")
 	cmdPullRequest.Flag.Uint64VarP(&flagPullRequestMilestone, "milestone", "M", 0, "MILESTONE")
 	cmdPullRequest.Flag.VarP(&flagPullRequestLabels, "labels", "l", "LABELS")
+	cmdPullRequest.Flag.StringVarP(&flagPullRequestRemote, "remote", "t", "", "REMOTE")
 
 	CmdRunner.Use(cmdPullRequest)
 }
@@ -126,7 +131,13 @@ func pullRequest(cmd *Command, args *Args) {
 	currentBranch, err := localRepo.CurrentBranch()
 	utils.Check(err)
 
-	baseProject, err := localRepo.MainProject()
+	// If the user specifies a remote, load that project
+	var baseProject *github.Project
+	if flagPullRequestRemote != "" {
+		baseProject, err = localRepo.RemoteProject(flagPullRequestRemote)
+	} else { // Otherwise, load the default
+		baseProject, err = localRepo.MainProject()
+	}
 	utils.Check(err)
 
 	host, err := github.CurrentConfig().PromptForHost(baseProject.Host)
