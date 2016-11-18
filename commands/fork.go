@@ -20,6 +20,9 @@ var cmdFork = &Command{
 	--org=<ORGANIZATION>
 		Fork the repository within this organization.
 
+	--remote
+		Specify the name of the remote to fork
+
 ## Examples:
 		$ hub fork
 		[ repo forked on GitHub ]
