@@ -16,9 +16,9 @@ var (
 	cmdRelease = &Command{
 		Run: listReleases,
 		Usage: `
-release [--include-drafts] [--exclude-prereleases] [-L <LIMIT>] [-r <REMOTE>]
-release show [-r <REMOTE>] <TAG>
-release create [-dpoc] [-a <FILE>] [-m <MESSAGE>|-F <FILE>] [-t <TARGET>] [-r <REMOTE>] <TAG>
+release [--include-drafts] [--exclude-prereleases] [-L <LIMIT>] [-R <REMOTE>]
+release show [-R <REMOTE>] <TAG>
+release create [-dpoc] [-a <FILE>] [-m <MESSAGE>|-F <FILE>] [-t <TARGET>] [-R <REMOTE>] <TAG>
 release edit [<options>] <TAG>
 release delete <TAG>
 `,
@@ -89,7 +89,7 @@ With '--exclude-prereleases', exclude non-stable releases from the listing.
 		A commit SHA or branch name to attach the release to, only used if <TAG>
 		doesn't already exist (default: main branch).
 
-	-r, --remote <REMOTE>
+	-R, --remote <REMOTE>
 		Specify the remote on which to interact with the releases
 
 	<TAG>
@@ -161,7 +161,7 @@ func init() {
 	cmdCreateRelease.Flag.StringVarP(&flagReleaseMessage, "message", "m", "", "MESSAGE")
 	cmdCreateRelease.Flag.StringVarP(&flagReleaseFile, "file", "F", "", "FILE")
 	cmdCreateRelease.Flag.StringVarP(&flagReleaseCommitish, "commitish", "t", "", "COMMITISH")
-	cmdCreateRelease.Flag.StringVarP(&flagReleaseRemote, "remote", "r", "", "REMOTE")
+	cmdCreateRelease.Flag.StringVarP(&flagReleaseRemote, "remote", "R", "", "REMOTE")
 
 	cmdEditRelease.Flag.BoolVarP(&flagReleaseEdit, "edit", "e", false, "EDIT")
 	cmdEditRelease.Flag.BoolVarP(&flagReleaseDraft, "draft", "d", false, "DRAFT")
@@ -170,7 +170,7 @@ func init() {
 	cmdEditRelease.Flag.StringVarP(&flagReleaseMessage, "message", "m", "", "MESSAGE")
 	cmdEditRelease.Flag.StringVarP(&flagReleaseFile, "file", "F", "", "FILE")
 	cmdEditRelease.Flag.StringVarP(&flagReleaseCommitish, "commitish", "t", "", "COMMITISH")
-	cmdEditRelease.Flag.StringVarP(&flagReleaseRemote, "remote", "r", "", "REMOTE")
+	cmdEditRelease.Flag.StringVarP(&flagReleaseRemote, "remote", "R", "", "REMOTE")
 
 	cmdRelease.Use(cmdShowRelease)
 	cmdRelease.Use(cmdCreateRelease)

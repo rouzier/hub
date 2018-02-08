@@ -12,14 +12,14 @@ import (
 
 var cmdCiStatus = &Command{
 	Run:   ciStatus,
-	Usage: "ci-status [-v] [-r <REMOTE>] [<COMMIT>]",
+	Usage: "ci-status [-v] [-R <REMOTE>] [<COMMIT>]",
 	Long: `Display GitHub Status information for a commit.
 
 ## Options:
 	-v
 		Print detailed report of all status checks and their URLs.
 
-	-r <REMOTE>
+	-R <REMOTE>
 		Specify the remote on which to run the command
 
 	<COMMIT>
@@ -38,7 +38,7 @@ var flagCiStatusRemote string
 
 func init() {
 	cmdCiStatus.Flag.BoolVarP(&flagCiStatusVerbose, "verbose", "v", false, "VERBOSE")
-	cmdCiStatus.Flag.StringVarP(&flagCiStatusRemote, "remote", "r", "", "REMOTE")
+	cmdCiStatus.Flag.StringVarP(&flagCiStatusRemote, "remote", "R", "", "REMOTE")
 
 	CmdRunner.Use(cmdCiStatus)
 }

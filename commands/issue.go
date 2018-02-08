@@ -17,9 +17,9 @@ var (
 	cmdIssue = &Command{
 		Run: listIssues,
 		Usage: `
-issue [-a <ASSIGNEE>] [-c <CREATOR>] [-@ <USER>] [-s <STATE>] [-f <FORMAT>] [-M <MILESTONE>] [-l <LABELS>] [-d <DATE>] [-o <SORT_KEY> [-^]] [-L <LIMIT>] [-r <REMOTE>]
-issue create [-oc] [-m <MESSAGE>|-F <FILE>] [-a <USERS>] [-M <MILESTONE>] [-l <LABELS>] [-r <REMOTE>]
-issue labels [--color] [-r <REMOTE>]
+issue [-a <ASSIGNEE>] [-c <CREATOR>] [-@ <USER>] [-s <STATE>] [-f <FORMAT>] [-M <MILESTONE>] [-l <LABELS>] [-d <DATE>] [-o <SORT_KEY> [-^]] [-L <LIMIT>] [-R <REMOTE>]
+issue create [-oc] [-m <MESSAGE>|-F <FILE>] [-a <USERS>] [-M <MILESTONE>] [-l <LABELS>] [-R <REMOTE>]
+issue labels [--color] [-R <REMOTE>]
 `,
 		Long: `Manage GitHub issues for the current project.
 
@@ -144,7 +144,7 @@ With no arguments, show a list of open issues.
 	--color
 		Enable colored output for labels list.
 
-	-r --remote
+	-R --remote
 		Specify the remote where the issue should be created.
 `,
 	}
@@ -152,14 +152,14 @@ With no arguments, show a list of open issues.
 	cmdCreateIssue = &Command{
 		Key:   "create",
 		Run:   createIssue,
-		Usage: "issue create [-o] [-m <MESSAGE>|-F <FILE>] [-a <USERS>] [-M <MILESTONE>] [-l <LABELS>] [-r <REMOTE>]",
+		Usage: "issue create [-o] [-m <MESSAGE>|-F <FILE>] [-a <USERS>] [-M <MILESTONE>] [-l <LABELS>] [-R <REMOTE>]",
 		Long:  "Open an issue in the current project.",
 	}
 
 	cmdLabel = &Command{
 		Key:   "labels",
 		Run:   listLabels,
-		Usage: "issue labels [--color] [-r <REMOTE>]",
+		Usage: "issue labels [--color] [-R <REMOTE>]",
 		Long:  "List the labels available in this repository.",
 	}
 
@@ -203,7 +203,7 @@ func init() {
 	cmdCreateIssue.Flag.BoolVarP(&flagIssueBrowse, "browse", "o", false, "BROWSE")
 	cmdCreateIssue.Flag.BoolVarP(&flagIssueCopy, "copy", "c", false, "COPY")
 	cmdCreateIssue.Flag.BoolVarP(&flagIssueEdit, "edit", "e", false, "EDIT")
-	cmdCreateIssue.Flag.StringVarP(&flagIssueRemote, "remote", "r", "", "REMOTE")
+	cmdCreateIssue.Flag.StringVarP(&flagIssueRemote, "remote", "R", "", "REMOTE")
 
 	cmdIssue.Flag.StringVarP(&flagIssueAssignee, "assignee", "a", "", "ASSIGNEE")
 	cmdIssue.Flag.StringVarP(&flagIssueState, "state", "s", "", "STATE")
@@ -218,7 +218,7 @@ func init() {
 	cmdIssue.Flag.BoolVarP(&flagIssueIncludePulls, "include-pulls", "", false, "INCLUDE_PULLS")
 	cmdIssue.Flag.IntVarP(&flagIssueLimit, "limit", "L", -1, "LIMIT")
 	cmdLabel.Flag.BoolVarP(&flagLabelsColorize, "color", "", false, "COLORIZE")
-	cmdLabel.Flag.StringVarP(&flagIssueRemote, "remote", "r", "", "REMOTE")
+	cmdLabel.Flag.StringVarP(&flagIssueRemote, "remote", "R", "", "REMOTE")
 
 	cmdIssue.Use(cmdCreateIssue)
 	cmdIssue.Use(cmdLabel)

@@ -20,7 +20,7 @@ var cmdFork = &Command{
 	--org=<ORGANIZATION>
 		Fork the repository within this organization.
 
-	--remote
+	-R, --remote-name, --remote
 		Specify the name of the remote to fork
 
 ## Examples:
@@ -48,6 +48,7 @@ var (
 func init() {
 	cmdFork.Flag.BoolVar(&flagForkNoRemote, "no-remote", false, "")
 	cmdFork.Flag.StringVarP(&flagForkRemoteName, "remote-name", "", "", "REMOTE")
+	cmdFork.Flag.StringVarP(&flagForkRemoteName, "remote", "R", "", "REMOTE")
 	cmdFork.Flag.StringVarP(&flagForkOrganization, "org", "", "", "ORGANIZATION")
 
 	CmdRunner.Use(cmdFork)

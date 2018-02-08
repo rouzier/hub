@@ -17,7 +17,7 @@ import (
 var cmdPullRequest = &Command{
 	Run: pullRequest,
 	Usage: `
-pull-request [-focp] [-b <BASE>] [-h <HEAD>] [-r <REVIEWERS> ] [-a <ASSIGNEES>] [-M <MILESTONE>] [-l <LABELS>] [-t <REMOTE>]
+pull-request [-focp] [-b <BASE>] [-h <HEAD>] [-r <REVIEWERS> ] [-a <ASSIGNEES>] [-M <MILESTONE>] [-l <LABELS>] [-R <REMOTE>]
 pull-request -m <MESSAGE>
 pull-request -F <FILE> [--edit]
 pull-request -i <ISSUE>
@@ -69,7 +69,7 @@ pull-request -i <ISSUE>
 	-l, --labels <LABELS>
 		Add a comma-separated list of labels to this pull request.
 
-	-t, --remote <REMOTE>
+	-R, --remote <REMOTE>
 		Specify the remote project where the pull request should be opened
 
 ## Configuration:
@@ -119,7 +119,7 @@ func init() {
 	cmdPullRequest.Flag.VarP(&flagPullRequestReviewers, "reviewer", "r", "USERS")
 	cmdPullRequest.Flag.Uint64VarP(&flagPullRequestMilestone, "milestone", "M", 0, "MILESTONE")
 	cmdPullRequest.Flag.VarP(&flagPullRequestLabels, "labels", "l", "LABELS")
-	cmdPullRequest.Flag.StringVarP(&flagPullRequestRemote, "remote", "t", "", "REMOTE")
+	cmdPullRequest.Flag.StringVarP(&flagPullRequestRemote, "remote", "R", "", "REMOTE")
 
 	CmdRunner.Use(cmdPullRequest)
 }
