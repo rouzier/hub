@@ -211,6 +211,7 @@ const (
 	helpFlag    = "--help"
 	configFlag  = "-c"
 	chdirFlag   = "-C"
+	remoteFlag  = "--remote"
 	flagPrefix  = "-"
 )
 
@@ -224,16 +225,14 @@ func slurpGlobalFlags(args *[]string, globalFlags *[]string) {
 
 	for i, arg := range *args {
 		if slurpNextValue {
-			commandIndex = i + 1
 			slurpNextValue = false
-		} else if arg == versionFlag || arg == helpFlag || !looksLikeFlag(arg) {
+		} else if stopProcessingArgs(arg) {
 			break
 		} else {
-			commandIndex = i + 1
-			if arg == configFlag || arg == chdirFlag {
-				slurpNextValue = true
-			}
+			slurpNextValue = isNextValueSlurpable(arg)
 		}
+
+		commandIndex = i + 1
 	}
 
 	if commandIndex > 0 {
@@ -241,6 +240,14 @@ func slurpGlobalFlags(args *[]string, globalFlags *[]string) {
 		*globalFlags = aa[0:commandIndex]
 		*args = aa[commandIndex:]
 	}
+}
+
+func stopProcessingArgs(arg string) bool {
+    return arg == versionFlag || arg == helpFlag || !looksLikeFlag(arg)
+}
+
+func isNextValueSlurpable(arg string) bool {
+    return arg == configFlag || arg == chdirFlag || arg == remoteFlag
 }
 
 func removeItem(slice []string, index int) (newSlice []string, item string) {
